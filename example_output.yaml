@@ -1,0 +1,97 @@
+---
+# Source: vault-secret-sync/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-ss
+  namespace: default
+---
+# Source: vault-secret-sync/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-ss-crb-default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: vault-ss
+    namespace: default
+---
+# Source: vault-secret-sync/templates/rbac.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vault-ss-role
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["*"]
+---
+# Source: vault-secret-sync/templates/rbac.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vault-ss-rolebinding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: vault-ss
+    namespace: default
+roleRef:
+  kind: Role
+  name: vault-ss-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vault-secret-sync/templates/cronjob.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: secret-sync
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: vault-ss
+          volumes:
+            - name: vault-token
+              emptyDir:
+                medium: Memory
+          restartPolicy: Never
+          containers:
+            - name: vault-approle-authenticator
+              image: "pennlabs/vault-approle-authenticator:6b1943395ed531fdc840c6bf7c66f971b38b178f"
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: vault-token
+                  mountPath: /home/vault/
+              env:
+                - name: VAULT_ADDR
+                  value: http://vault.default:8200
+                - name: VAULT_TOKEN_PATH
+                  value: /home/vault/.vault-token
+              envFrom:
+                - secretRef:
+                    name: secret-sync
+            - name: vault-kubernetes-synchronizer
+              image: "postfinance/vault-kubernetes-synchronizer:0.1.3"
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: vault-token
+                  mountPath: /home/vault/
+              env:
+                - name: VAULT_ADDR
+                  value: http://vault.default:8200
+                - name: VAULT_SKIP_VERIFY
+                  value: "true"
+                - name: VAULT_TOKEN_PATH
+                  value: /home/vault/.vault-token
+                - name: SECRET_PREFIX
+                  value: ""
+                - name: VAULT_SECRETS
+                  value: "secrets/chronos/default/"

@@ -1,0 +1,26 @@
+# Schedule for the secret sync cronjob to run
+cron_schedule: "*/10 * * * *"
+
+# Address of the vault instance to connect to
+vault_address: http://vault.default:8200
+
+# Name of the secret that contains ROLE_ID and SECRET_ID
+secret_name: secret-sync
+
+# Which namespaces to sync secrets to
+namespaces:
+  - default
+  # - monitoring
+
+# Name of the cluster within vault
+cluster: chronos
+
+# Options for the authenticator container
+authenticator:
+  image: pennlabs/vault-approle-authenticator
+  tag: "6b1943395ed531fdc840c6bf7c66f971b38b178f"
+
+# Options for the synchronizer container
+synchronizer:
+  image: postfinance/vault-kubernetes-synchronizer
+  tag: "0.1.3"

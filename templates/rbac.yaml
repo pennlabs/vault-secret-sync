@@ -1,0 +1,45 @@
+{{- range .Values.namespaces }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-ss
+  namespace: {{ . }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vault-ss-role
+  namespace: {{ . }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vault-ss-rolebinding
+  namespace: {{ . }}
+subjects:
+  - kind: ServiceAccount
+    name: vault-ss
+    namespace: {{ . }}
+roleRef:
+  kind: Role
+  name: vault-ss-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-ss-crb-{{ . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: vault-ss
+    namespace: {{ . }}
+{{ end }}

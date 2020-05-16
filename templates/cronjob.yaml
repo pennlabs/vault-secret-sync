@@ -1,0 +1,52 @@
+{{- $values := .Values }}
+{{- range .Values.namespaces }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: secret-sync
+spec:
+  schedule: {{ $values.cron_schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: vault-ss
+          volumes:
+            - name: vault-token
+              emptyDir:
+                medium: Memory
+          restartPolicy: Never
+          containers:
+            - name: vault-approle-authenticator
+              image: "{{ $values.authenticator.image }}:{{ $values.authenticator.tag }}"
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: vault-token
+                  mountPath: /home/vault/
+              env:
+                - name: VAULT_ADDR
+                  value: {{ $values.vault_address }}
+                - name: VAULT_TOKEN_PATH
+                  value: /home/vault/.vault-token
+              envFrom:
+                - secretRef:
+                    name: {{ $values.secret_name }}
+            - name: vault-kubernetes-synchronizer
+              image: "{{ $values.synchronizer.image }}:{{ $values.synchronizer.tag }}"
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: vault-token
+                  mountPath: /home/vault/
+              env:
+                - name: VAULT_ADDR
+                  value: {{ $values.vault_address }}
+                - name: VAULT_SKIP_VERIFY
+                  value: "true"
+                - name: VAULT_TOKEN_PATH
+                  value: /home/vault/.vault-token
+                - name: SECRET_PREFIX
+                  value: ""
+                - name: VAULT_SECRETS
+                  value: "secrets/{{ $values.cluster }}/{{ . }}/"
+{{ end }}
