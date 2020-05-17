@@ -17,7 +17,7 @@ spec:
               emptyDir:
                 medium: Memory
           restartPolicy: Never
-          containers:
+          initContainers:
             - name: vault-approle-authenticator
               image: "{{ $values.authenticator.image }}:{{ $values.authenticator.tag }}"
               imagePullPolicy: IfNotPresent
@@ -32,6 +32,7 @@ spec:
               envFrom:
                 - secretRef:
                     name: {{ $values.secret_name }}
+          containers:
             - name: vault-kubernetes-synchronizer
               image: "{{ $values.synchronizer.image }}:{{ $values.synchronizer.tag }}"
               imagePullPolicy: IfNotPresent
