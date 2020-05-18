@@ -10,7 +10,7 @@ secret_name: secret-sync
 # Which namespaces to sync secrets to
 namespaces:
   - default
-  # - monitoring
+  - monitoring
 
 # Name of the cluster within vault
 cluster: chronos
