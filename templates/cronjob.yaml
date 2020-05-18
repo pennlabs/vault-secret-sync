@@ -5,6 +5,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: secret-sync
+  namespace: {{ . }}
 spec:
   schedule: {{ $values.cron_schedule | quote }}
   jobTemplate:
