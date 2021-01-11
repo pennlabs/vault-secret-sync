@@ -12,16 +12,18 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: vault-secret-sync
+          serviceAccountName: secret-sync
           volumes:
             - name: vault-token
               emptyDir:
                 medium: Memory
           restartPolicy: Never
           initContainers:
-            - name: vault-approle-authenticator
-              image: "{{ $values.authenticator.image }}:{{ $values.authenticator.tag }}"
+            - name: vault-authenticator
+              image: "{{ $values.vault.image }}:{{ $values.vault.tag }}"
               imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "-c"]
+              args: ["vault login -method=aws -token-only > /home/vault/.vault-token"]
               volumeMounts:
                 - name: vault-token
                   mountPath: /home/vault/
@@ -30,9 +32,6 @@ spec:
                   value: {{ $values.vault_address }}
                 - name: VAULT_TOKEN_PATH
                   value: /home/vault/.vault-token
-              envFrom:
-                - secretRef:
-                    name: {{ $values.secret_name }}
           containers:
             - name: vault-kubernetes-synchronizer
               image: "{{ $values.synchronizer.image }}:{{ $values.synchronizer.tag }}"

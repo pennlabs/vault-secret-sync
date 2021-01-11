@@ -1,10 +1,13 @@
+{{- $values := .Values }}
 {{- range .Values.namespaces }}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vault-secret-sync
+  name: secret-sync
   namespace: {{ . }}
+  annotations:
+    eks.amazonaws.com/role-arn: {{ $values.role_arn | quote }}
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -23,7 +26,7 @@ metadata:
   namespace: {{ . }}
 subjects:
   - kind: ServiceAccount
-    name: vault-secret-sync
+    name: secret-sync
     namespace: {{ . }}
 roleRef:
   kind: Role
