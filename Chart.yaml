@@ -3,6 +3,6 @@ name: vault-secret-sync
 description: A Helm chart to sync Vault secrets
 
 type: application
-version: 0.1.4
+version: 0.1.5
 
 appVersion: 1.16.0

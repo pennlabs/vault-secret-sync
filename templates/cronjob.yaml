@@ -1,7 +1,7 @@
 {{- $values := .Values }}
 {{- range .Values.namespaces }}
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: secret-sync
@@ -12,6 +12,8 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            fsGroup: 65534
           serviceAccountName: secret-sync
           volumes:
             - name: vault-token
