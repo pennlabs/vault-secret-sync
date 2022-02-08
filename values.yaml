@@ -7,7 +7,6 @@ vault_address: https://vault.pennlabs.org
 # Which namespaces to sync secrets to
 namespaces:
   - default
-  - cert-manager
 
 # Name of the cluster within vault
 cluster: production
