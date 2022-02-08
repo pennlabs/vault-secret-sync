@@ -47,7 +47,7 @@ export class MyStack extends Stack {
             CR_TOKEN: '${{ secrets.BOT_GITHUB_PAT }}',
             CR_OWNER: 'pennlabs',
             CR_GIT_REPO: 'helm-charts',
-            CR_PACKAGE_PATH: '.deploy',
+            // CR_PACKAGE_PATH: '.deploy',
             CR_SKIP_EXISTING: 'true',
           },
         },
