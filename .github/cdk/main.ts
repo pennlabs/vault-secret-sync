@@ -49,6 +49,8 @@ export class MyStack extends Stack {
             CR_GIT_REPO: 'helm-charts',
             // CR_PACKAGE_PATH: '.deploy',
             CR_SKIP_EXISTING: 'true',
+            CR_PAGES_BRANCH: 'master',
+            CR_INDEX_PATH: 'index.yaml',
           },
         },
       ],
