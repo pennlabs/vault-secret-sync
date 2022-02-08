@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Configure git
         run: |-
           git config user.name github-actions
@@ -19,7 +21,7 @@ jobs:
         with:
           version: v3.7.2
       - name: Publish helm chart
-        uses: helm/chart-releaser-action@v1.2.0
+        uses: helm/chart-releaser-action@v1.3.0
         with:
           charts_dir: .
           charts_repo_url: https://helm.pennlabs.org

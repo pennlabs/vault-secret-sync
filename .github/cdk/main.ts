@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import { Construct } from 'constructs';
-import { App, CheckoutJob, Stack, Workflow } from 'cdkactions';
+import { App, Job, Stack, Workflow } from 'cdkactions';
 
 export class MyStack extends Stack {
   constructor(scope: Construct, name: string) {
@@ -15,9 +15,15 @@ export class MyStack extends Stack {
       },
     });
 
-    new CheckoutJob(workflow, 'publish', {
+    new Job(workflow, 'publish', {
       runsOn: 'ubuntu-latest',
       steps: [
+        {
+          uses: 'actions/checkout@v2',
+          with: {
+            'fetch-depth': 0,
+          },
+        },
         {
           name: 'Configure git',
           run: dedent`git config user.name github-actions
@@ -32,7 +38,7 @@ export class MyStack extends Stack {
         },
         {
           name: 'Publish helm chart',
-          uses: 'helm/chart-releaser-action@v1.2.0',
+          uses: 'helm/chart-releaser-action@v1.3.0',
           with: {
             charts_dir: '.',
             charts_repo_url: 'https://helm.pennlabs.org',
