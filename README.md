@@ -1,6 +1,6 @@
 # Vault Secret Sync Helm Chart
 
-[![CircleCI](https://circleci.com/gh/pennlabs/vault-secret-sync.svg?style=shield)](https://circleci.com/gh/pennlabs/vault-secret-sync)
+[![Publish Helm Chart](https://github.com/pennlabs/vault-secret-sync/actions/workflows/cdkactions_publish.yaml/badge.svg)](https://github.com/pennlabs/vault-secret-sync/actions/workflows/cdkactions_publish.yaml)
 
 This helm chart sets up secret sync between a Vault instance and a Kubernetes cluster. It is based on, and uses [postfinance/vault-kubernetes](https://github.com/postfinance/vault-kubernetes) to do the actual secret synchronization, but we use the official vault docker image that authenticates using the aws auth method.
 
